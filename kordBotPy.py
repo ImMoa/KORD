@@ -3,14 +3,11 @@ import asyncio
 import datetime
 import random
 import time
-import clr
 
 import json
 
-clr.AddReference("kord")
-from kord import Translator
-
 from discord import app_commands
+from PapagoLib import Translator
 
 with open("./keys.json", 'r') as f:
     cfg = json.load(f)
@@ -24,7 +21,7 @@ TR_Cliend_Secret = cfg['PapagoTranslator']['TR_Cliend_Secret']
 LD_Cliend_Id = cfg['PapagoLanguageDetector']['LD_Cliend_Id']
 LD_Cliend_Secret = cfg['PapagoLanguageDetector']['LD_Cliend_Secret']
 
-trns = Translator(TR_Cliend_Id, TR_Cliend_Secret, LD_Cliend_Id, LD_Cliend_Secret)
+Translator(TR_Cliend_Id, TR_Cliend_Secret, LD_Cliend_Id, LD_Cliend_Secret)
 
 #region Bot initialize
 class MyClient(discord.Client):
@@ -53,8 +50,14 @@ async def kd(
     query: app_commands.Range[str, 0, 30]
 ):
     """한국어 문자열을 무작위 공백을 포함한 번역투 문장으로 변환"""
-    output = trns.getDst(query)
-    await interaction.response.send_message(output, ephemeral=True)
+
+    if(not Translator.LangDect(query)):
+        print(query + ' not')
+        await interaction.response.send_message('입력된 문자열이 한국어가 아닙니다.', ephemeral=True)
+    else:
+        print(query)
+        output = Translator.getRes(query)
+        await interaction.response.send_message(output, ephemeral=True)
 
 # Get result without random blanks
 @client.tree.command()
@@ -64,7 +67,7 @@ async def kdnorm(
     query: app_commands.Range[str, 0, 30]
 ):
     """한국어 문자열을 추가적 공백 삽입 없는 번역투 문장으로 변환"""
-    output = trns.getDst(query, False)
+    output = Translator.getRes(query, False)
     await interaction.response.send_message(output, ephemeral=True)
 
 # Button class
