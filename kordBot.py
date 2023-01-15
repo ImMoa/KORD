@@ -15,15 +15,14 @@ from discord import app_commands
 with open("./keys.json", 'r') as f:
     cfg = json.load(f)
 
-MY_GUILD = discord.Object(GUILD_ID)
+MY_GUILD = discord.Object(id=cfg['GUILD_ID'])
 
-#MY_GUILD = discord.Object(id=cfg['GUILD_ID'])
 
-# TR_Cliend_Id = cfg['PapagoTranslator']['TR_Cliend_Id']
-# TR_Cliend_Secret = cfg['PapagoTranslator']['TR_Cliend_Secret']
+TR_Cliend_Id = cfg['PapagoTranslator']['TR_Cliend_Id']
+TR_Cliend_Secret = cfg['PapagoTranslator']['TR_Cliend_Secret']
 
-# LD_Cliend_Id = cfg['PapagoLanguageDetector']['LD_Cliend_Id']
-# LD_Cliend_Secret = cfg['PapagoLanguageDetector']['LD_Cliend_Secret']
+LD_Cliend_Id = cfg['PapagoLanguageDetector']['LD_Cliend_Id']
+LD_Cliend_Secret = cfg['PapagoLanguageDetector']['LD_Cliend_Secret']
 
 trns = Translator(TR_Cliend_Id, TR_Cliend_Secret, LD_Cliend_Id, LD_Cliend_Secret)
 
@@ -159,4 +158,4 @@ async def line(interaction: discord.Interaction, prize: str, hour: int, min: int
             embed.add_field(name='"주작 결과"', value=f'<@{winner[1]}>', inline=False)
             await thrdMsg.edit(embed=embed, view=None)
 
-client.run(BotToken)
+client.run(cfg['BotToken'])
