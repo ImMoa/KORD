@@ -55,7 +55,6 @@ async def kd(
         print(query + ' not')
         await interaction.response.send_message('입력된 문자열이 한국어가 아닙니다.', ephemeral=True)
     else:
-        print(query)
         output = Translator.getRes(query)
         await interaction.response.send_message(output, ephemeral=True)
 
