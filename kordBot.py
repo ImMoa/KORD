@@ -112,7 +112,7 @@ async def checkOver(endTime):
             if(int(time.time()) >= endTime):
                 break
             # Check evrey minute.
-            await asyncio.sleep(60.0)        
+            await asyncio.sleep(1.0)        
     
         return True
 
@@ -122,7 +122,7 @@ async def line(interaction: discord.Interaction, prize: str, hour: int, min: int
     """줄을 세운다...!"""
     
     # Get deadline from user
-    total_time = 3600 * hour + 60 * min
+    total_time = 3600 * hour + 60 * min + sec
     ts = int(time.time()) + total_time
     
     # Create countdown Task
@@ -134,7 +134,7 @@ async def line(interaction: discord.Interaction, prize: str, hour: int, min: int
     # Initial Embed
     embed = discord.Embed(title='"줄"', timestamp=datetime.datetime.now(), colour=discord.Colour.random())
     embed.add_field(name='상품', value=prize, inline=True)
-    embed.add_field(name='마감까지의 시간', value=f"<t:{ts}:R>", inline=False)
+    embed.add_field(name='마감까지 남은 시간', value=f"<t:{ts}:R>", inline=False)
     embed.add_field(name='줄 세운 사람', value=f'<@{interaction.user.id}>')
     
     # Create Thread under channel where command input
@@ -147,15 +147,27 @@ async def line(interaction: discord.Interaction, prize: str, hour: int, min: int
     # Wait for task ends
     isTaskEnd = await task
 
-    if(isTaskEnd):
-        if(len(view.entryList) == 0):
+    if (isTaskEnd):
+        if (len(view.entryList) == 0):
             # If entryList is empty, feedback to Thread and remove view from embed
+            embed.clear_fields()
+            
+            embed.add_field(name='상품', value=prize, inline=True)
+            embed.add_field(name='마감 시간', value=f"<t:{ts}:F>", inline=False)
+            embed.add_field(name='줄 세운 사람', value=f'<@{interaction.user.id}>')
             embed.add_field(name='"주작 결과"', value='참가자가 없었어요.', inline=False)
             await thrdMsg.edit(embed=embed, view=None)
         else:
             # Get winner and edit embed
             winner = random.choice(view.entryList)
-            embed.add_field(name='"주작 결과"', value=f'<@{winner[1]}>', inline=False)
+            embed.clear_fields()
+            
+            embed.add_field(name='상품', value=prize, inline=True)
+            embed.add_field(name='마감 시간', value=f"<t:{ts}:F>", inline=False)
+            embed.add_field(name='줄 세운 사람', value=f'<@{interaction.user.id}>')
+            embed.add_field(name='"주작 결과"',
+                            value=f'<@{winner[1]}>',
+                            inline=False)
             await thrdMsg.edit(embed=embed, view=None)
 
 client.run(cfg['BotToken'])
