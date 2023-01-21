@@ -126,7 +126,7 @@ async def line(interaction: discord.Interaction, prize: str, hour: int, min: int
 
     # Get csv
     pc.load_csv(interaction.guild_id)
-    lastIdx = pc.csv.iat[pc.csv.index[-1], 0]
+    lastIdx = pc.load_csv(interaction.guild_id) + 1
     
     # Get deadline from user
     total_time = 3600 * hour + 60 * min + sec
@@ -185,7 +185,7 @@ async def line(interaction: discord.Interaction, prize: str, hour: int, min: int
 
             # Temp Data
             dictTemp = {
-                    '#': [lastIdx + 1],
+                    '#': [lastIdx],
                     '품목': [prize],
                     '시작 시간': [datetime.datetime.fromtimestamp(start_time)],
                     '마감 시간': [datetime.datetime.fromtimestamp(ts)],
