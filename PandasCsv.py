@@ -33,7 +33,12 @@ class pdCsv:
             return 0
 
         pdCsv.csv = pd.read_csv(pdCsv.addr, encoding='utf-8-sig', index_col = 0)
-        last = pdCsv.csv.iat[pdCsv.csv.index[-1], 0]
+
+        try:
+            last = pdCsv.csv.iat[pdCsv.csv.index[-1], 0]
+        except:
+            return 0
+            
         return last
 
     def save_csv(dict):
