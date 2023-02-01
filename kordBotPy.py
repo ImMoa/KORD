@@ -73,7 +73,7 @@ async def kdnorm(
 # Button class
 class Entry(discord.ui.View):
     def __init__(self, ebdInteraction):
-        super().__init__()
+        super().__init__(timeout=None)
         self.value = None
         self.ebdIntr = ebdInteraction
         self.entryList = []
@@ -111,6 +111,9 @@ class Entry(discord.ui.View):
 
 # Async function that check the deadline is reached
 async def checkOver(endTime):
+        if(int(time.time()) <= endTime):
+            return False
+
         while True:
             if(int(time.time()) >= endTime):
                 break
@@ -138,6 +141,7 @@ async def line(interaction: discord.Interaction, prize: str, hour: int, min: int
 
     # Create button View
     view = Entry(interaction)
+    #view.timeout(None)
 
     # Initial Embed
     embed = discord.Embed(title=f'"줄 #{lastIdx}"', timestamp=datetime.datetime.now(), colour=discord.Colour.random())
@@ -205,5 +209,27 @@ async def line(interaction: discord.Interaction, prize: str, hour: int, min: int
                             value=f'<@{winner[1]}>',
                             inline=False)
             await thrdMsg.edit(embed=embed, view=None)
+
+    else:
+        # Temp Data
+                dictTemp = {
+                        '#': [lastIdx],
+                        '품목': [prize],
+                        '시작 시간': [datetime.datetime.fromtimestamp(start_time)],
+                        '마감 시간': [datetime.datetime.fromtimestamp(ts)],
+                        '줄 세운 사람': [f'({interaction.user.id} / {interaction.user.display_name})'],
+                        '주작 결과': ['No proper deadline input']
+                    }
+
+                pc.save_csv(dictTemp)
+
+                # Feedback to Thread and remove view from embed
+                embed.clear_fields()
+
+                embed.add_field(name='상품', value=prize, inline=True)
+                embed.add_field(name='마감 시간', value=f"<t:{ts}:F>", inline=False)
+                embed.add_field(name='줄 세운 사람', value=f'<@{interaction.user.id}>')
+                embed.add_field(name='마감시간은 현재 시간보다 빠를 수 없습니다.', inline=False)
+                await thrdMsg.edit(embed=embed, view=None)
 
 client.run(cfg['BotToken'])
