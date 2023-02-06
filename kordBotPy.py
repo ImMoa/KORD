@@ -7,8 +7,10 @@ import time
 import json
 
 from discord import app_commands
+import requests
 from PapagoLib import Translator
 from PandasCsv import pdCsv as pc
+from Currency import Exchange as ex
 
 with open("./keys.json", 'r') as f:
     cfg = json.load(f)
@@ -231,5 +233,24 @@ async def line(interaction: discord.Interaction, prize: str, hour: int, min: int
                 embed.add_field(name='줄 세운 사람', value=f'<@{interaction.user.id}>')
                 embed.add_field(name='마감시간은 현재 시간보다 빠를 수 없습니다.', inline=False)
                 await thrdMsg.edit(embed=embed, view=None)
+
+@client.tree.command()
+@app_commands.describe(twd='신 타이완 달러')
+async def t2k(interaction: discord.Interaction, twd: float):
+    """신 타이완 달러를 원화로 표시"""
+
+    result = ex.NTtoKRW(twd)
+    await interaction.response.send_message(f"NT$ {twd}는 원화로 {result}원", ephemeral=True)
+
+@client.tree.command()
+@app_commands.describe(src='변환할 화폐', amount='돈의 양', dst='변환 목적 화폐')
+async def exchange(interaction: discord.Interaction, src: str, amount: float, dst: str):
+    """환율 계산"""
+
+    result = ex.exchCur(src, amount, dst)
+    src = src.upper()
+    dst = dst.upper()
+    
+    await interaction.response.send_message(f"{src} {amount} to {dst} \n {result}", ephemeral=True)
 
 client.run(cfg['BotToken'])
