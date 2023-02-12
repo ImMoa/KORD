@@ -7,7 +7,6 @@ import time
 import json
 
 from discord import app_commands
-import requests
 from PapagoLib import Translator
 from PandasCsv import pdCsv as pc
 from Currency import Exchange as ex
@@ -239,8 +238,11 @@ async def line(interaction: discord.Interaction, prize: str, hour: int, min: int
 async def t2k(interaction: discord.Interaction, twd: float):
     """신 타이완 달러를 원화로 표시"""
 
-    result = ex.NTtoKRW(twd)
-    await interaction.response.send_message(f"NT$ {twd}는 원화로 {result}원", ephemeral=True)
+    result = ex.exchCur('twd', twd, 'krw')
+
+    twd = format(twd, ',')
+
+    await interaction.response.send_message(f"NT$ {twd} to KRW\n{result}", ephemeral=True)
 
 @client.tree.command()
 @app_commands.describe(src='변환할 화폐', amount='돈의 양', dst='변환 목적 화폐')
@@ -250,7 +252,9 @@ async def exchange(interaction: discord.Interaction, src: str, amount: float, ds
     result = ex.exchCur(src, amount, dst)
     src = src.upper()
     dst = dst.upper()
+
+    amount = format(amount, ',')
     
-    await interaction.response.send_message(f"{src} {amount} to {dst} \n {result}", ephemeral=True)
+    await interaction.response.send_message(f"{src} {amount} to {dst}\n{result}", ephemeral=True)
 
 client.run(cfg['BotToken'])
